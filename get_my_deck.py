@@ -39,7 +39,10 @@ def find_console(mytext):
 
 def runner(driver):
     all_btn = driver.find_elements(By.XPATH, "//*[@id='SaleSection_33131']")
-    x = all_btn[0].text
+    try:
+        x = all_btn[0].text
+    except:
+        return 0
     stock = find_console(x)
     if stock[1].lower() != "out of stock":
         to="jacobbfull@gmail.com" ## Sender email address
