@@ -41,16 +41,13 @@ def runner(driver):
     all_btn = driver.find_elements(By.XPATH, "//*[@id='SaleSection_33131']")
     x = all_btn[0].text
     stock = find_console(x)
-    print(stock)
-    if x[1].lower() == "out of stock":
-        print("test success")
+    if stock[1].lower() != "out of stock":
         to="jacobbfull@gmail.com" ## Sender email address
         from_="jacobbfull@gmail.com" ## Recipient email address
-        body="Test: {} is {}\nhttps://store.steampowered.com/sale/steamdeckrefurbished"
         s.sendmail(
-            to_addrs= to,
-            from_addr= from_,
-            msg= body
+            to_addrs=to,
+            from_addr=from_,
+            msg="Time to buy, the console is in stock right now"
         )
         status = 1
     else:
