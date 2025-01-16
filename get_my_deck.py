@@ -3,13 +3,16 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import time
-from twilio.rest import Client
+import smtplib
 from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 
-account_sid = "from_twilio" ## SIGN UP FOR A FREE TWILIO ACCOUNT AND GET YOUR SID AND AUTH TOKEN 
-auth_token  = "from_twilio" ## AS ABOVE
-client = Client(account_sid, auth_token)
+# Set up SMTP instance
+s = smtplib.SMTP('smtp.gmail.com', 587)
+# start TLS for security
+s.starttls()
+# Authentication
+s.login("jacobbfull@gmail.com", "twjr ihio nnlo woqm")
 
 browser_options = Options()
 browser_options.add_argument("--headless=new")
@@ -18,8 +21,6 @@ url = "https://store.steampowered.com/sale/steamdeckrefurbished"
 def start():
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=browser_options)
-
-    
     driver.get(url)
     return driver
 
@@ -31,20 +32,29 @@ def refresh(driver):
 def quit(driver):
     driver.quit()
 
+def find_console(mytext):
+    prods = mytext.split('\n')
+    idx = prods.index("Steam Deck 512 GB OLED - Valve Certified Refurbished")
+    return (prods[idx], prods[idx+1])
 
 def runner(driver):
     all_btn = driver.find_elements(By.XPATH, "//*[@id='SaleSection_33131']")
     x = all_btn[0].text
-    x = x.split("00")[0]  ## HERE YOU CAN BREAKPOINT AND DETERMINE WHICH PART OF THE TEXT YOU ARE INTERESTED IN (E.G. STRIP FOR 64GB, 256GB ETC
-    print(x)
-    if "add" in x.lower():
-        message = client.messages.create(
-            to="+44777777777", ## THE NUMBER THE ALERT WILL GO TO
-            from_="+44777777777", ## THE NUMBER PROVIDED BY TWILIO
-            body="In Stock https://store.steampowered.com/sale/steamdeckrefurbished")
+    stock = find_console(x)
+    print(stock)
+    if x[1].lower() == "out of stock":
+        print("test success")
+        to="jacobbfull@gmail.com" ## Sender email address
+        from_="jacobbfull@gmail.com" ## Recipient email address
+        body="Test: {} is {}\nhttps://store.steampowered.com/sale/steamdeckrefurbished"
+        s.sendmail(
+            to_addrs= to,
+            from_addr= from_,
+            msg= body
+        )
         status = 1
     else:
-        print(x)
+        print(stock)
         print(datetime.now())
         status = 0
     return status
